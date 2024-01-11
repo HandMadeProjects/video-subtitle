@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    {% load static %}
+
+    <style>
+        #colorChangeDiv {
+            width: 100%;
+            height: 50px;
+            text-align: center;
+            line-height: 50px;
+            font-size: 18px;
+            color: white;
+            transition: background-color 1s ease; /* Smooth color transition over 1 second */
+        }
+
+        .body-container {
+            height: 27rem;
+            overflow-y: auto;
+            scrollbar-width: thin; /* Firefox */
+            scrollbar-color: #656161 #686464; /* Firefox */
+    
+            /* Webkit (Chrome, Safari) */
+            &::-webkit-scrollbar {
+                width: 10px;
+            }
+    
+            &::-webkit-scrollbar-thumb {
+                background-color: #8d0ba1;
+            }
+    
+            &::-webkit-scrollbar-track {
+                background-color: #f0f0f0;
+            }
+        }
+    </style>
+
+    <title>PlayTube | Video Player with Subtitles</title>
+
+</head>
+<body id="colorChangeDiv" style="background-color: #333; color: #fff;" class="h-[570px] body-container font-mono">
+
+    <!-- navbar -->
+    <div class="border h-14 shadow-xl bg-gray-800">
+        <div href="/" class="text-red-400 font-bold text-3xl p-1 grid grid-cols-3">
+            
+                <a href="/" class="">
+                    <i class="fa-regular fa-circle-play ml-2"></i> PlayTube
+                </a>
+
+                <div></div>
+
+                <div class="ml-24">
+                    <a class="hover:text-red-600 text-xl text-right text-red-300 border rounded-md px-2 py-1" href="/upload_files"><i class="fa-solid fa-cloud-arrow-up mr-2 "></i> Upload Video</a>
+                </div>
+
+        </div>
+    <!-- <div id="colorChangeDiv" >Color Changing Div</div> -->
+
+    </div>
+
+
+    <div class="grid grid-cols-5 gap-4 mt-4">
+
+        <div class="col-span-4 border mx-screen p-2 py-4 rounded-md hover:drop-shadow-[0_35px_35px_rgba(0,0,0,0.25)]">
+            
+            <video id="videoPlayer" width="900" height="600" controls class="mx-auto rounded-md border">
+                <!-- <source src="{{ media_full_path }}/{{ playvideo.v_path }}" type="video/mp4"> -->
+                <source src="{% static playvideo.v_path %}" type="video/mp4">
+                <track src="{% static playvideo.sub_path %}" kind="subtitles" srclang="en" label="English" default>
+                Your browser does not support the video tag.
+            </video>
+            
+
+            <div>
+                {{playvideo.title}} <i class="text-sm">( {{ playvideo.upload_date }} )</i> 
+                <b class="ml-10"><i class="fa-solid fa-paperclip mr-2"></i>API : </b>
+                <a class="border p-1 rounded-md" href="/get_video/{{playvideo.v_id}}">get Video</a>
+                <a class="border p-1 rounded-md" href="/get_subtitle/{{playvideo.v_id}}">get Subtitle</a>
+            </div>
+            
+        </div>
+
+        <div class="border rounded-md">
+            <div class="text-2xl my-4 font-bold">Playlist</div>
+        
+            <div class="body-container" style="max-height: 550px; overflow-y: auto;">
+                {% for video in allvideos %}
+                    <div class="text-md text-gray-400 border mx-2 my-1 rounded-md">
+                        <a href="/video_detail/{{ video.v_id }}/" >{{ video.title }} <i class="text-sm">({{ video.upload_date }} )</i></a>
+                    </div>
+                {% endfor %}
+
+            </div>
+        </div>
+    </div>
+
+    <div class="text-sm mt-2 text-red-300">PlayTube | 2024</div>
+
+<script>
+    const videoPlayer = document.getElementById('videoPlayer');
+    videoPlayer.addEventListener('play', function () {
+        // Display subtitles based on timestamp
+        const subtitles = [
+            { start: 0, end: 5, text: 'Demo subtitle at 0-5 seconds' },
+            { start: 10, end: 15, text: 'Demo subtitle at 10-15 seconds' },
+            // Add more subtitles as needed
+        ];
+
+        videoPlayer.addEventListener('timeupdate', function () {
+            const currentTime = videoPlayer.currentTime;
+
+            //for (const subtitle of subtitles) {
+            //    if (currentTime >= subtitle.start && currentTime <= subtitle.end) {
+            //        alert(subtitle.text); // Replace with your preferred way of displaying subtitles
+            //    }
+            //}
+        });
+    });
+
+    const colorChangeDiv = document.getElementById('colorChangeDiv');
+    let currentColorIndex = 0;
+
+    //const colors = ['red', 'green', 'blue', 'orange', 'yellow'];
+
+    //const colors = ['#990000', '#003300', '#000066', '#994C00', '#999900'];
+    const colors = ['#003300']; //fix color
+
+
+    videoPlayer.addEventListener('play', function () {
+        setInterval(() => {
+            colorChangeDiv.style.backgroundColor = colors[currentColorIndex];
+            currentColorIndex = (currentColorIndex + 1) % colors.length;
+        }, 5000); // Change color every 5 seconds (adjust as needed)
+    });
+</script>
+
+</body>
+</html>
